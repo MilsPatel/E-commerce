@@ -4,7 +4,7 @@ const User = require("../../models/User");
 
 //register
 const registerUser = async (req, res) => {
-  const { userName, email, password } = req.body;
+  const { userName, email, password,firstName,lastName,confirmPassword } = req.body;
 
   try {
     const checkUser = await User.findOne({ email });
@@ -13,12 +13,21 @@ const registerUser = async (req, res) => {
         success: false,
         message: "User Already exists with the same email! Please try again",
       });
+    if(password!==confirmPassword)
+      return res.json({
+        success: false,
+        message: "Password and Confirm Password are not Matching",
+      });
 
     const hashPassword = await bcrypt.hash(password, 12);
     const newUser = new User({
       userName,
       email,
       password: hashPassword,
+      firstName,
+      lastName,
+      confirmPassword
+
     });
 
     await newUser.save();
